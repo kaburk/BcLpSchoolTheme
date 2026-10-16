@@ -1,0 +1,2 @@
+﻿id,description,thanks,unpublish,sender_1,sender_2,sender_name,subject_user,subject_admin,form_template,mail_template,redirect_url,auth_captcha,widget_area,ssl_on,save_info,publish_begin,publish_end,created,modified
+1,<p>次の項目を入力して、「入力内容を確認する」を押してください。</p>,"<p>体験レッスンにお申し込みいただき、ありがとうございます。<br>内容を確認のうえ、教室から体験レッスンの日時をご連絡します。</p><p>ご入力のメールアドレスに、受付完了のメールをお送りしました。</p><p>メールが届かないときは、お手数ですがお電話ください。<br><a href=""tel:0300000000"">03-0000-0000</a>（受付 14:00〜20:00、土曜は9:00〜15:00）</p>",,,,サンプル英会話教室,【サンプル英会話教室】体験レッスンのお申し込みを受け付けました,【サンプル英会話教室】体験レッスンのお申し込みがありました,default,mail_default,,,,,1,,,,

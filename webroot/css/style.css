@@ -1,0 +1,406 @@
+@charset "UTF-8";
+/* ==========================================================================
+   BcLpSchoolTheme : baserCMS5 スクール LP テーマ
+
+   サイト全体（ヘッダー・フッター・フォーム画面）と、公開画面だけに効かせる本文の配置
+   - 接頭辞 sc-（BEM）
+   - 色はテーマ設定の4色（config.css の --theme-*）から作る。未保存のときは下記のフォールバック色
+   - 本文（BurgerEditor）の見た目は bge_style.css
+   - ブレークポイント: 600px / 820px / 1000px（ヘッダーのナビ）
+   ========================================================================== */
+
+/* ---- Tokens（bge_style.css にも同じものがある。値を変えるときは両方） ---- */
+:root {
+	/* フォールバックの値は theme_configs.csv の初期値と同じにする */
+	--sc-main: var(--theme-main, #f2762e);
+	--sc-sub: var(--theme-sub, #3b3355);
+	--sc-link: var(--theme-link, #c95a1c);
+	--sc-hover: var(--theme-hover, #9c4413);
+	/* 薄めた色 */
+	--sc-main-soft: color-mix(in srgb, var(--sc-main) 8%, #fff);
+	--sc-main-tint: color-mix(in srgb, var(--sc-main) 18%, #fff);
+	--sc-main-line: color-mix(in srgb, var(--sc-main) 45%, #fff);
+	--sc-main-dark: color-mix(in srgb, var(--sc-main) 86%, #000);
+	--sc-sub-soft: color-mix(in srgb, var(--sc-sub) 6%, #fff);
+	--sc-sub-tint: color-mix(in srgb, var(--sc-sub) 13%, #fff);
+	--sc-line: color-mix(in srgb, var(--sc-sub) 16%, #fff);
+	/* 白地に載せる文字の色・濃い背景（下の @supports で、どの色でもコントラストを保つよう明るさを抑える） */
+	--sc-head: var(--sc-sub);
+	--sc-dark: var(--sc-sub);
+	--sc-link-ink: var(--sc-link);
+	--sc-hover-ink: var(--sc-hover);
+	/* メインの背景に載せる文字の色（背景の明るさで白／黒を切り替える） */
+	--sc-on-main: #1f1f1f;
+	--sc-text: #222;
+	--sc-muted: #4d4d4d;
+	--sc-field: #858585;
+	--sc-font: "Zen Kaku Gothic New", system-ui, sans-serif;
+	--sc-font-head: "Zen Maru Gothic", "Zen Kaku Gothic New", sans-serif;
+	--sc-header-h: 76px;
+	--sc-width: 1120px;
+	--sc-gutter: 24px;
+}
+@supports (color: oklch(from red l c h)) {
+	:root {
+		--sc-head: oklch(from var(--sc-sub) min(l, 0.42) c h);
+		--sc-dark: oklch(from var(--sc-sub) min(l, 0.34) c h);
+		--sc-link-ink: oklch(from var(--sc-link) min(l, 0.52) c h);
+		--sc-hover-ink: oklch(from var(--sc-hover) min(l, 0.44) c h);
+		--sc-on-main: oklch(from var(--sc-main) clamp(0.2, (0.64 - l) * 999, 1) 0 0);
+	}
+}
+@media (max-width: 600px) {
+	:root { --sc-gutter: 16px; --sc-header-h: 64px; }
+}
+
+/* ---- Base ---- */
+html { scroll-padding-top: var(--sc-header-h); -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+.sc-body { margin: 0; font-family: var(--sc-font); font-size: 16px; line-height: 1.8; color: var(--sc-text); background: #fff; }
+.sc-body *, .sc-body *::before, .sc-body *::after { box-sizing: border-box; }
+.sc-body a { color: var(--sc-link-ink); text-underline-offset: 4px; }
+.sc-body a:hover { color: var(--sc-hover-ink); }
+.sc-body img { max-width: 100%; height: auto; }
+.sc-body :focus-visible { outline: 3px solid var(--sc-head); outline-offset: 3px; }
+.sc-body [hidden] { display: none !important; }
+.sc-body :is(h1, h2, h3) { word-break: auto-phrase; }
+.sc-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.sc-wrap { max-width: var(--sc-width); margin: 0 auto; padding: 0 var(--sc-gutter); }
+.sc-eyebrow { margin: 0; color: var(--sc-muted); font-size: 14px; font-weight: 700; letter-spacing: .18em; line-height: 1.6; }
+
+/* ---- Buttons ---- */
+.sc-btn,
+.sc-body a.sc-btn {
+	display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+	min-height: 56px; padding: 0 32px; border: 2px solid transparent; border-radius: 999px;
+	background: var(--sc-main); color: var(--sc-on-main);
+	font: inherit; font-size: 17px; font-weight: 700; line-height: 1.4; text-align: center;
+	text-decoration: none; cursor: pointer;
+}
+.sc-btn:hover,
+.sc-body a.sc-btn:hover { background: var(--sc-main-dark); color: var(--sc-on-main); }
+.sc-btn--ghost,
+.sc-body a.sc-btn--ghost { border-color: var(--sc-head); background: #fff; color: var(--sc-head); }
+.sc-btn--ghost:hover,
+.sc-body a.sc-btn--ghost:hover { background: var(--sc-sub-soft); color: var(--sc-head); }
+.sc-btn--sm,
+.sc-body a.sc-btn--sm { min-height: 46px; padding: 0 22px; font-size: 16px; }
+.sc-btn--lg,
+.sc-body a.sc-btn--lg { min-height: 64px; padding: 0 40px; font-size: 18px; }
+@media (prefers-reduced-motion: no-preference) {
+	.sc-btn, .sc-body a.sc-btn { transition: background-color .2s, border-color .2s, transform .2s; }
+	.sc-btn:hover, .sc-body a.sc-btn:hover { transform: translateY(-2px); }
+}
+
+/* ---- Header ---- */
+.sc-header { position: sticky; top: 0; z-index: 30; background: rgba(255, 255, 255, .96); border-bottom: 1px solid var(--sc-line); }
+.sc-header__inner { display: flex; align-items: center; gap: 28px; max-width: 1200px; height: var(--sc-header-h); }
+.sc-header__logo,
+.sc-body .sc-header__logo { display: flex; align-items: center; flex: none; max-width: 260px; color: var(--sc-head); font-family: var(--sc-font-head); font-size: 20px; font-weight: 700; line-height: 1.4; text-decoration: none; }
+.sc-header__logo img { display: block; max-height: 46px; width: auto; }
+.sc-nav { margin-left: auto; }
+.sc-nav ul { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.sc-body .sc-nav a { padding: 8px 0; color: var(--sc-head); font-weight: 500; text-decoration: none; }
+.sc-body .sc-nav a:hover { color: var(--sc-hover-ink); text-decoration: underline; }
+.sc-header__cta { flex: none; }
+.sc-header__inner > .sc-header__cta:nth-child(2) { margin-left: auto; }
+.sc-burger { display: none; align-items: center; justify-content: center; width: 48px; height: 48px; margin-left: auto; padding: 0; border: 1px solid var(--sc-line); border-radius: 12px; background: #fff; color: var(--sc-head); cursor: pointer; }
+.sc-burger svg { width: 24px; height: 24px; }
+.sc-burger .sc-burger__close { display: none; }
+.sc-burger[aria-expanded="true"] .sc-burger__open { display: none; }
+.sc-burger[aria-expanded="true"] .sc-burger__close { display: block; }
+.sc-drawer { padding: 8px var(--sc-gutter) 24px; border-top: 1px solid var(--sc-line); background: #fff; box-shadow: 0 12px 24px rgba(0, 0, 0, .08); }
+.sc-drawer ul { margin: 0; padding: 0; list-style: none; }
+.sc-body .sc-drawer li a { display: block; padding: 14px 4px; border-bottom: 1px solid var(--sc-line); color: var(--sc-head); font-weight: 500; text-decoration: none; }
+.sc-body .sc-drawer a.sc-btn { display: flex; margin-top: 16px; }
+.sc-back { margin-left: auto; white-space: nowrap; }
+@media (min-width: 1001px) { .sc-drawer { display: none !important; } }
+@media (max-width: 1000px) {
+	.sc-nav, .sc-header__cta { display: none !important; }
+	.sc-burger { display: inline-flex; }
+}
+@media (max-width: 600px) {
+	.sc-header__inner { gap: 12px; }
+	.sc-header__logo img { max-height: 40px; }
+	.sc-body a.sc-back { padding: 0 14px; font-size: 15px; }
+}
+
+/* ---- Main ---- */
+.sc-main { display: block; }
+.sc-main > .sc-flash { max-width: var(--sc-width); margin: 16px auto; padding: 0 var(--sc-gutter); }
+
+/* ---- 本文：空の画像（公開画面のみ） ----
+   BurgerEditor の「選択画像を削除する」は data-bge-empty を "0" のまま img の src だけを空にする。
+   bge_style.css の「空の画像」の点線の枠は編集エリア用なので、公開画面ではグレーの枠（仮の写真）にする。 */
+.sc-body .bge-contents img[src=""] { display: none; }
+.sc-body .bge-contents .bgt-image:is([data-bge-empty="1"], :has(img[src=""])) {
+	display: flex; align-items: center; justify-content: center; min-height: 0; padding: 0; border: 0; border-radius: 16px;
+	background: #e4e4e4; aspect-ratio: 3 / 2;
+}
+.sc-body .bge-contents .bgt-image:is([data-bge-empty="1"], :has(img[src=""]))::before { content: none; }
+.sc-body .sc-blk--teachers .bgt-image:is([data-bge-empty="1"], :has(img[src=""])) { aspect-ratio: 1 / 1; }
+.sc-body .sc-blk--hero .bgt-image:is([data-bge-empty="1"], :has(img[src=""])) { aspect-ratio: 4 / 3; border-radius: 24px; }
+
+/* ---- 本文：ヒーローの写真が空のときの図形（公開画面のみ） ----
+   bge_style.css に書くと編集エリアでも画像の欄が消え、写真を登録できなくなる。
+   3×3 のマスに、角丸の四角（::before）と円（::after）を並べる。1つの図形を描き、残りは box-shadow で写す
+   （box-shadow は要素と同じ角丸の形になる）。位置と大きさは枠の幅に対する割合（cqw） */
+.sc-body .sc-blk--hero .bgt-grid--last:has([data-bge-empty="1"], img[src=""]) {
+	--c: 30.6667cqw; /* マスの大きさ（(100 - 間隔 4 × 2) / 3） */
+	--s: 34.6667cqw; /* 隣のマスまでの距離（マス＋間隔） */
+	position: relative; container-type: inline-size; aspect-ratio: 1 / 1;
+}
+.sc-body .sc-blk--hero .bgt-grid--last:has([data-bge-empty="1"], img[src=""]) > * { display: none; }
+.sc-body .sc-blk--hero .bgt-grid--last:has([data-bge-empty="1"], img[src=""])::before,
+.sc-body .sc-blk--hero .bgt-grid--last:has([data-bge-empty="1"], img[src=""])::after {
+	content: ""; position: absolute; top: 0; width: var(--c); height: var(--c);
+}
+/* 角丸の四角：上段の中央（サブの薄い色）、中段の左・右、下段の中央 */
+.sc-body .sc-blk--hero .bgt-grid--last:has([data-bge-empty="1"], img[src=""])::before {
+	left: var(--s); border-radius: 7.8cqw; background: var(--sc-sub-tint);
+	box-shadow:
+		calc(var(--s) * -1) var(--s) 0 0 var(--sc-main-tint),
+		var(--s) var(--s) 0 0 var(--sc-main),
+		0 calc(var(--s) * 2) 0 0 var(--sc-main-line);
+}
+/* 円：上段の左（メイン）・右、中段の中央、下段の左・右 */
+.sc-body .sc-blk--hero .bgt-grid--last:has([data-bge-empty="1"], img[src=""])::after {
+	left: 0; border-radius: 50%; background: var(--sc-main);
+	box-shadow:
+		calc(var(--s) * 2) 0 0 0 var(--sc-main-tint),
+		var(--s) var(--s) 0 0 var(--sc-dark),
+		0 calc(var(--s) * 2) 0 0 var(--sc-sub-tint),
+		calc(var(--s) * 2) calc(var(--s) * 2) 0 0 var(--sc-main-tint);
+}
+@media (max-width: 820px) {
+	.sc-body .sc-blk--hero .bgt-grid--last:has([data-bge-empty="1"], img[src=""]) { width: min(100%, 420px); margin-inline: auto; }
+}
+
+/* ---- 本文：左右2列の組み合わせ（公開画面のみ） ----
+   「地図（sc-blk--map）→ 教室の情報（sc-blk--info）」がこの順に並んでいるときだけ、PC では左右に並べる。
+   並べ替えて隣り合わなくなったら、自動で縦に積む。
+   bge_style.css に書くと編集エリアでも float になり、後ろのブロックの操作領域が重なって選べなくなる。 */
+@media (min-width: 821px) {
+	.bge-contents {
+		--sc-col-w: calc(100% - var(--sc-inline) * 2);
+		--sc-map-left: calc(var(--sc-col-w) * .5 - 20px);
+	}
+	.bge-contents > .sc-blk--map:has(+ .sc-blk--info) { float: left; width: calc(var(--sc-inline) + var(--sc-map-left)); padding-right: 0; }
+	.bge-contents > .sc-blk--map + .sc-blk--info { padding-left: calc(var(--sc-inline) + var(--sc-map-left) + 40px); }
+	/* 右の列の次のブロックで float を解除する */
+	.bge-contents > .sc-blk--map + .sc-blk--info + * { clear: both; }
+}
+
+/* ---- お知らせの一覧（LP のショートコード [Lp.news] とブログの一覧で共通） ----
+   LP では本文の段落（<p>）の中に置き換わるので、a・span・time をブロック表示にして並べる */
+.sc-news { display: block; max-width: 880px; margin: 0 auto; border-top: 1px solid var(--sc-line); }
+.sc-body .sc-news a.sc-news__item { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 4px 28px; padding: 24px 8px; border-bottom: 1px solid var(--sc-line); color: var(--sc-text); text-decoration: none; }
+.sc-news__date { color: var(--sc-muted); font-weight: 700; font-variant-numeric: tabular-nums; }
+.sc-news__body { display: flex; flex-direction: column; gap: 4px; }
+.sc-news__title { color: var(--sc-link-ink); font-size: 18px; font-weight: 700; line-height: 1.6; text-decoration: underline; text-underline-offset: 4px; }
+.sc-news__text { display: block; color: var(--sc-muted); }
+.sc-body .sc-news a.sc-news__item:hover .sc-news__title { color: var(--sc-hover-ink); }
+/* 一覧へのリンク（白いボタン） */
+.sc-news__more { display: block; margin-top: 40px; text-align: center; }
+.sc-body .sc-news__more a {
+	display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 22px;
+	border: 2px solid var(--sc-head); border-radius: 999px; background: #fff; color: var(--sc-head);
+	font-size: 16px; font-weight: 700; text-decoration: none;
+}
+.sc-body .sc-news__more a:hover { background: var(--sc-sub-soft); color: var(--sc-head); }
+.sc-news__empty { display: block; margin: 0; padding: 24px 8px; border-bottom: 1px solid var(--sc-line); color: var(--sc-muted); }
+@media (max-width: 600px) {
+	.sc-body .sc-news a.sc-news__item { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---- ブログの画面（一覧・アーカイブ・詳細） ---- */
+.sc-wrap--narrow { max-width: calc(880px + var(--sc-gutter) * 2); }
+.sc-psec { min-height: 60vh; padding: 72px 0 96px; }
+.sc-phead { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 48px; text-align: center; }
+.sc-phead__title { margin: 0; color: var(--sc-head); font-family: var(--sc-font-head); font-size: 36px; font-weight: 700; line-height: 1.4; }
+.sc-phead__title::after { content: ""; display: block; width: 48px; height: 6px; margin: 18px auto 0; border-radius: 3px; background: var(--sc-main); }
+.sc-phead--post { align-items: flex-start; text-align: left; }
+.sc-phead--post .sc-phead__title { font-size: 30px; }
+.sc-phead--post .sc-phead__title::after { content: none; }
+.sc-psec__lead { margin: -16px 0 40px; text-align: center; }
+.sc-psec__lead > * { margin: 0; }
+.sc-psec__back { margin: 40px 0 0; text-align: center; }
+.sc-post__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; margin: 8px 0 0; color: var(--sc-muted); font-weight: 700; font-variant-numeric: tabular-nums; }
+.sc-post__meta a { font-size: 14px; font-weight: 500; }
+.sc-post__eyecatch { margin: 0 0 40px; }
+.sc-post__eyecatch img { display: block; width: 100%; height: auto; border-radius: 20px; }
+.sc-post__body { padding-bottom: 48px; border-bottom: 1px solid var(--sc-line); }
+.sc-post__body > :first-child { margin-top: 0; }
+.sc-post__body :is(h2, h3, h4) { margin: 2em 0 .8em; color: var(--sc-head); font-family: var(--sc-font-head); line-height: 1.5; }
+.sc-post__body img { border-radius: 16px; }
+.sc-post__nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; margin-top: 32px; }
+.sc-post__next { text-align: right; }
+.sc-post__list { white-space: nowrap; }
+/* ページ送り（bc-front の paginations/simple の出力に当てる） */
+.sc-psec .bs-pagination { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 48px; }
+.sc-psec .bs-pagination > span { display: contents; }
+.sc-psec .bs-pagination :is(.bs-pagination__number, .bs-pagination__prev, .bs-pagination__next) { display: inline-flex; }
+.sc-psec .bs-pagination :is(a, .current, .disabled) { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 12px; border: 1px solid var(--sc-line); border-radius: 999px; text-decoration: none; }
+.sc-psec .bs-pagination .current { border-color: var(--sc-dark); background: var(--sc-dark); color: #fff; }
+.sc-psec .bs-pagination .disabled { color: var(--sc-muted); }
+@media (max-width: 600px) {
+	.sc-psec { padding: 48px 0 64px; }
+	.sc-phead { margin-bottom: 36px; }
+	.sc-phead__title { font-size: 28px; }
+	.sc-phead--post .sc-phead__title { font-size: 24px; }
+	.sc-post__nav { grid-template-columns: 1fr 1fr; }
+	.sc-post__list { grid-column: 1 / -1; grid-row: 2; text-align: center; }
+}
+
+/* ---- Footer ---- */
+.sc-footer { padding: 56px 0 28px; background: var(--sc-dark); color: #fff; }
+.sc-body .sc-footer a,
+.sc-body .sc-footer a:hover { color: inherit; }
+.sc-body .sc-footer a:hover { text-decoration: none; }
+.sc-footer .bs-widget { margin: 0; }
+.sc-footer .bs-widget-text { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 32px; }
+.sc-footer .bs-widget-head { margin: 0 0 4px; font-size: 16px; }
+.sc-footer p { margin: 0; }
+.sc-footer__name { margin-bottom: 12px !important; font-family: var(--sc-font-head); font-size: 22px; font-weight: 700; }
+.sc-footer ul { display: flex; flex-wrap: wrap; gap: 24px; margin: 0; padding: 0; list-style: none; }
+.sc-footer__copy { display: block; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, .25); color: rgba(255, 255, 255, .88); font-size: 14px; }
+
+/* ---- Form screens（BcMail） ---- */
+.sc-fsec { min-height: 70vh; padding: 56px 0 96px; background: var(--sc-main-soft); }
+.sc-fsec > .sc-wrap { max-width: calc(820px + var(--sc-gutter) * 2); }
+.sc-fhead { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.sc-fhead__title { margin: 0; color: var(--sc-head); font-family: var(--sc-font-head); font-size: 36px; font-weight: 700; line-height: 1.4; }
+.sc-fhead__title::after { content: ""; display: block; width: 48px; height: 6px; margin: 18px auto 0; border-radius: 3px; background: var(--sc-main); }
+.sc-steps { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 28px 0 36px; padding: 0; list-style: none; }
+.sc-steps li { display: flex; align-items: center; gap: 10px; padding: 6px 18px 6px 6px; border: 1px solid var(--sc-line); border-radius: 999px; background: #fff; color: var(--sc-muted); font-weight: 700; }
+.sc-steps__n { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--sc-sub-soft); color: var(--sc-head); font-size: 15px; }
+.sc-steps li.is-current { border-color: transparent; background: var(--sc-dark); color: #fff; }
+.sc-steps li.is-current .sc-steps__n { background: var(--sc-main); color: var(--sc-on-main); }
+.sc-fbox { padding: 40px 48px; border: 1px solid var(--sc-line); border-radius: 20px; background: #fff; }
+.sc-fbox__lead { margin: 0 0 8px; }
+.sc-fbox__lead > * { margin: 0; }
+.sc-fbox__lead > * + * { margin-top: 8px; }
+.sc-done { display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; }
+.sc-done__icon { display: grid; place-items: center; width: 88px; height: 88px; border-radius: 50%; background: var(--sc-main); color: var(--sc-on-main); }
+.sc-done__title { margin: 0; color: var(--sc-head); font-family: var(--sc-font-head); font-size: 26px; font-weight: 700; line-height: 1.5; }
+.sc-done__message { display: flex; flex-direction: column; gap: 12px; max-width: 600px; }
+.sc-done__message > * { margin: 0; }
+/* 完了メッセージの最後の段落（電話の案内）を薄い背景の枠にする */
+.sc-done__message > p:last-child:not(:first-child) { margin-top: 16px; padding: 20px; border-radius: 16px; background: var(--sc-sub-soft); }
+.sc-done .sc-btn { margin-top: 8px; }
+
+/* フォーム本体（bc-front の mail_form / mail_input の出力構造に当てる） */
+.sc-form .bs-mail-form-body { display: block; width: 100%; border-collapse: collapse; }
+.sc-form .bs-mail-form-body tbody { display: block; }
+.sc-form .bs-mail-form-body tr { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 10px 32px; align-items: start; padding: 24px 0; border-bottom: 1px solid var(--sc-line); }
+.sc-form .bs-mail-form-body th,
+.sc-form .bs-mail-form-body td { display: block; width: auto; padding: 0; border: 0; background: none; text-align: left; }
+.sc-form .bs-mail-form-body th.col-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding-top: 12px; color: var(--sc-head); font-weight: 700; line-height: 1.5; }
+.sc-form .col-head label { color: inherit; }
+.sc-form .required,
+.sc-form .normal { flex: none; padding: 0 8px; border-radius: 6px; font-size: 13px; font-weight: 700; line-height: 1.7; white-space: nowrap; }
+.sc-form .required { background: var(--sc-dark); color: #fff; }
+.sc-form .normal { padding: 0 7px; border: 1px solid #767676; background: #fff; color: var(--sc-muted); }
+.sc-form .col-input { color: var(--sc-text); }
+.sc-form .col-input > span[id^="FieldMessage"] { display: inline; }
+.sc-form .bs-mail-before-attachment,
+.sc-form .bs-mail-after-attachment { color: var(--sc-muted); font-size: 15px; }
+.sc-form .bs-mail-attention,
+.sc-form .bs-mail-description { display: block; margin: 6px 0 0; color: var(--sc-muted); font-size: 15px; }
+.sc-form .bs-mail-description { margin: 0 0 6px; }
+.sc-form input[type="text"],
+.sc-form input[type="email"],
+.sc-form input[type="tel"],
+.sc-form input[type="number"],
+.sc-form input[type="password"],
+.sc-form select,
+.sc-form textarea {
+	width: 100%; min-height: 52px; padding: 12px 16px;
+	border: 1.5px solid var(--sc-field); border-radius: 12px; background: #fff;
+	color: var(--sc-text); font: inherit; font-size: 16px; line-height: 1.6;
+}
+.sc-form textarea { min-height: 140px; resize: vertical; }
+.sc-form ::placeholder { color: #767676; }
+.sc-form input:focus,
+.sc-form select:focus,
+.sc-form textarea:focus { outline: 3px solid var(--sc-main-line); outline-offset: 1px; border-color: var(--sc-head); }
+/* 欄の幅（メールフィールドの「クラス名」に入れる） */
+.sc-form .sc-w-md { max-width: 400px; }
+.sc-form .sc-w-sm { max-width: 260px; }
+/* 姓・名のように class="form-s" の欄が並ぶ行は2列にする */
+.sc-form .col-input:has(input.form-s) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.sc-form .col-input:has(input.form-s) > span[id^="FieldMessage"] { display: block; }
+.sc-form input.form-s { width: 100%; }
+/* ラジオ：選択肢を枠で囲んだボタンにする（選択肢は span#FieldMessage〇〇 の中に「span > input + label」で並ぶ） */
+.sc-form span[id^="FieldMessage"]:has(> span > input[type="radio"]) { display: flex; flex-wrap: wrap; gap: 12px; }
+.sc-form span[id^="FieldMessage"]:has(> span > input[type="radio"]) > :not(:has(> input)) { flex-basis: 100%; }
+.sc-form span[id^="FieldMessage"]:has(> span > input[type="radio"]) > :not(:has(> input)):empty { display: none; }
+.sc-form .col-input span:has(> input[type="radio"]) {
+	position: relative; display: inline-flex; align-items: center; min-height: 52px; padding: 0 22px;
+	border: 1.5px solid var(--sc-field); border-radius: 12px; background: #fff; font-weight: 500;
+}
+.sc-form .col-input span:has(> input[type="radio"]:checked) { padding: 0 21.5px; border: 2px solid var(--sc-head); background: var(--sc-main-soft); }
+/* ラベル全体を押せるようにする */
+.sc-form .col-input span:has(> input[type="radio"]) label::after { content: ""; position: absolute; inset: 0; }
+.sc-form .col-input span:has(> input[type="checkbox"]) { display: inline-flex; align-items: center; min-height: 44px; }
+.sc-form input[type="radio"],
+.sc-form input[type="checkbox"] { flex: none; width: 20px; height: 20px; margin: 0 10px 0 0; accent-color: var(--sc-dark); }
+.sc-form .col-input span:has(> input) label { cursor: pointer; }
+.sc-form .col-input span:has(> input[type="checkbox"]) label { font-weight: 700; }
+/* 個人情報の取り扱い（チェックボックスの行）：見出しの列をなくし、中央寄せの枠にする */
+.sc-form:not(.is-confirm) .bs-mail-form-body tr:has(input[type="checkbox"]) { display: block; margin-top: 32px; padding: 20px 24px; border: 0; border-radius: 16px; background: var(--sc-sub-soft); text-align: center; }
+.sc-form:not(.is-confirm) .bs-mail-form-body tr:has(input[type="checkbox"]) th { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.sc-form:not(.is-confirm) .bs-mail-form-body tr:has(input[type="checkbox"]) td { text-align: center; }
+.sc-form:not(.is-confirm) .bs-mail-form-body tr:has(input[type="checkbox"]) .bs-mail-description { margin: 0 0 12px; font-size: 15px; }
+.sc-form:not(.is-confirm) .bs-mail-form-body tr:has(input[type="checkbox"]) .error-message { justify-content: center; }
+/* エラー */
+.sc-form .error-message { display: flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--sc-text); font-size: 15px; font-weight: 700; }
+.sc-form .error-message::before {
+	content: ""; flex: none; width: 18px; height: 18px; background: currentColor;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5v5.5M12 16.5v.01'/%3E%3C/svg%3E") center / contain no-repeat;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5v5.5M12 16.5v.01'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.sc-form .form-error { border: 2px solid var(--sc-dark) !important; background: var(--sc-main-soft) !important; }
+/* ボタン */
+.sc-form .bs-mail-form-submit { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 36px; }
+.sc-form .bs-mail-form-submit .bs-button {
+	display: inline-flex; align-items: center; justify-content: center; min-height: 64px; padding: 0 40px;
+	border: 2px solid transparent; border-radius: 999px; background: var(--sc-main); color: var(--sc-on-main);
+	font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; transition: background-color .2s, border-color .2s;
+}
+.sc-form .bs-mail-form-submit .bs-button:hover { background: var(--sc-main-dark); }
+.sc-form .bs-mail-form-submit #BtnMessageBack,
+.sc-form .bs-mail-form-submit input[type="reset"] { border-color: var(--sc-head); background: #fff; color: var(--sc-head); }
+.sc-form .bs-mail-form-submit #BtnMessageBack:hover { background: var(--sc-sub-soft); }
+/* 確認画面（freeze 時は値のテキストが出る） */
+.sc-form.is-confirm .bs-mail-form-body tr { padding: 18px 0; }
+.sc-form.is-confirm .bs-mail-form-body th.col-head { padding-top: 0; }
+.sc-form.is-confirm .required,
+.sc-form.is-confirm .normal,
+.sc-form.is-confirm .bs-mail-description,
+.sc-form.is-confirm .bs-mail-attention { display: none; }
+.sc-form.is-confirm .col-input { white-space: pre-wrap; overflow-wrap: anywhere; }
+.sc-form.is-confirm .col-input:has(input.form-s) { display: block; }
+.sc-form.is-confirm .col-input:has(input.form-s) > span[id^="FieldMessage"] { display: inline; }
+/* 日付のカレンダー（jQuery UI）をテーマの色に寄せる */
+.ui-datepicker { z-index: 40 !important; font-family: var(--sc-font); }
+.ui-datepicker .ui-state-active,
+.ui-datepicker .ui-state-highlight { border-color: var(--sc-main); background: var(--sc-main); color: var(--sc-on-main); }
+@media (max-width: 820px) {
+	.sc-form .bs-mail-form-body tr { grid-template-columns: minmax(0, 1fr); }
+	.sc-form .bs-mail-form-body th.col-head { padding-top: 0; }
+}
+@media (max-width: 600px) {
+	.sc-fsec { padding: 40px 0 64px; }
+	.sc-fhead__title { font-size: 28px; }
+	.sc-fbox { padding: 24px 18px; }
+	.sc-form .col-input:has(input.form-s) { gap: 10px; }
+	.sc-form .bs-mail-form-submit { flex-direction: column-reverse; }
+	.sc-form .bs-mail-form-submit .bs-button { width: 100%; padding: 0 20px; }
+	.sc-done .sc-btn { width: 100%; }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+	.sc-body *, .sc-body *::before, .sc-body *::after { transition: none !important; animation: none !important; }
+}
